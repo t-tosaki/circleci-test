@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  github-cli: circleci/github-cli@2.2.0
+  github-cli: circleci/github-cli@2.8
 
 jobs:
   deploy:
@@ -10,17 +10,20 @@ jobs:
     steps:
       - checkout
 
-      - github-cli/install
-
       - run:
           name: Login GitHub App
           command: |
-            echo "$GH_APP_PRIVATE_KEY" > /tmp/github_app_key.pem
+            echo "$GH_APP_PRIVATE_KEY" | base64 --decode > private-key.pem
 
-            gh auth login \
-              --with-app-id "$GH_APP_ID" \
-              --with-app-installation-id "GH_APP_INSTALLATION_ID" \
-              --with-key-file /tmp/github_app_key.pem
+            INSTALLATION_TOKEN=$(./.circleci/authorize-github-app-token.sh \
+              "$GH_APP_ID" \
+              "$GH_APP_INSTALLATION_ID" \
+              "private-key.pem"
+            )
+
+            echo "export GITHUB_TOKEN=$INSTALLATION_TOKEN" >> $BASH_ENV
+
+      - github-cli/setup
 
       - run:
           name: Set deployment name
