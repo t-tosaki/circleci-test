@@ -26,9 +26,9 @@ jobs:
       - run:
           name: Set deployment name
           command: |
-            echo "repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/commits/${COMMIT_HASH}/pulls"
+            echo "repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/commits/${CIRCLE_SHA1}/pulls"
 
-            PR_JSON=$(gh api "repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/commits/${COMMIT_HASH}/pulls" \
+            PR_JSON=$(gh api "repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/commits/${CIRCLE_SHA1}/pulls" \
                --jq '.[] | select(.base.ref == "master") | {number, url: .html_url}'
             )
 
