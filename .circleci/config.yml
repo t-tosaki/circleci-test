@@ -92,6 +92,8 @@ jobs:
             )
             echo "export GITHUB_TOKEN=$INSTALLATION_TOKEN" >> $BASH_ENV
 
+      - github-cli/setup
+
       - run:
           name: Replace latest GitHub release
           command: |
