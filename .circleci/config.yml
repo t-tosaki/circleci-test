@@ -8,34 +8,16 @@ jobs:
       - checkout
 
       - run:
-          name: Set deployment name
-          command: |
-            echo "export VERSION=production-$(date +%Y.%m.%d)-${CIRCLE_WORKFLOW_ID}" >> $BASH_ENV
-            echo "export DEPLOY_NAME=deploy-${CIRCLE_WORKFLOW_ID}" >> $BASH_ENV
-
-      - run:
-          name: Plan deployment
-          command: |
-            circleci run release plan $DEPLOY_NAME \
-              --environment-name=production \
-              --component-name=test \
-              --target-version=$VERSION
-            circleci run release update $DEPLOY_NAME --status=RUNNING
-
-      - run:
           name: Do something
           command: echo Hello, World!
 
       - run:
           name: Create GitHub tag
           command: |
+            git config user.email "ci@example.com"
+            git config user.name "CircleCI"
             git tag -a "$VERSION" -m "CI: ${CIRCLE_BUILD_URL}\nTriggerd by: ${CIRCLE_USERNAME}"
             git push origin "$VERSION"
-
-      - run:
-          name: Mark deployment
-          command: |
-            circleci run release update $DEPLOY_NAME --status=SUCCESS
 
 workflows:
   deploy-workflow:
