@@ -106,7 +106,7 @@ jobs:
 
             * **Target version**: [<< pipeline.parameters.rollback_tag >>](https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/releases/tag/<< pipeline.parameters.rollback_tag >>)
             * **Rollbacked by**: @${CIRCLE_USERNAME}
-            **Full Changelog**: https://github.com/t-tosaki/circleci-test/compare/${LATEST_RELEASE_TAG}...<< pipeline.parameters.rollback_tag >>
+            **Full Changelog**: https://github.com/t-tosaki/circleci-test/compare/<< pipeline.parameters.rollback_tag >>...${LATEST_RELEASE_TAG}
 
             ---
 
