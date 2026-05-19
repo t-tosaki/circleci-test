@@ -1,0 +1,38 @@
+version: 2.1
+
+jobs:
+  rollback:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+
+      - run:
+          name: Set rollback name
+          command: |
+            echo "export VERSION=<< pipeline.deploy.target_version >>" >> $BASH_ENV
+            echo "export ROLLBACK_NAME=rollback-${CIRCLE_WORKFLOW_ID}" >> $BASH_ENV
+
+      - run:
+          name: Plan rollback
+          command: |
+            circleci run release plan $ROLLBACK_NAME \
+              --environment-name=<< pipeline.deploy.environment_name >> \
+              --component-name=<< pipeline.deploy.component_name >> \
+              --target-version=$VERSION \
+              --rollback
+            circleci run release update $ROLLBACK_NAME --status=RUNNING
+
+      - run:
+          name: Do something
+          command: echo Hello, World!
+
+      - run:
+          name: Mark rollback
+          command: |
+            circleci run release update $ROLLBACK_NAME --status=SUCCESS
+
+workflows:
+  rollback-workflow:
+    jobs:
+      - rollback:
