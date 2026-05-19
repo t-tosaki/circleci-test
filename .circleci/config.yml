@@ -3,6 +3,11 @@ version: 2.1
 orbs:
   github-cli: circleci/github-cli@2.7
 
+parameters:
+  rollback_tag:
+    type: string
+    default: ""
+
 jobs:
   deploy:
     docker:
@@ -60,8 +65,55 @@ jobs:
               --title "${VERSION}" \
               --generate-notes
 
+  rollback:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+
+      - run:
+          name: Get rollback sha
+          command: |
+            ROLLBACK_SHA=$(git rev-parse "<< pipeline.parameters.rollback_tag >>^{commit}")
+            echo "export REVERT_SHA=${ROLLBACK_SHA}" >> $BASH_ENV
+
+      - run:
+          name: Checkout target
+          command: |
+            git checkout "${ROLLBACK_SHA}"
+            git rev-parse HEAD
+
+      - run:
+          name: Login GitHub App
+          command: |
+            echo "$GH_APP_PRIVATE_KEY" | base64 --decode > private-key.pem
+            INSTALLATION_TOKEN=$(./.circleci/scripts/authorize-github-app-token.sh \
+              "$GH_APP_ID" \
+              "$GH_APP_INSTALLATION_ID" \
+              "private-key.pem"
+            )
+            echo "export GITHUB_TOKEN=$INSTALLATION_TOKEN" >> $BASH_ENV
+
+      - run:
+          name: Replace latest GitHub release
+          command: |
+            gh release edit "<< pipeline.parameters.rollback_tag >>" --latest
+
 workflows:
+  rollback-workflow:
+    when:
+      not:
+        equal: ["", << pipeline.parameters.rollback_tag >>]
+    jobs:
+      - rollback:
+          filters:
+            branches:
+              only:
+                - master
+
   deploy-workflow:
+    when:
+      equal: ["", << pipeline.parameters.rollback_tag >>]
     jobs:
       - deploy:
           filters:
