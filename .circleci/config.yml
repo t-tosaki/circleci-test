@@ -15,7 +15,7 @@ jobs:
           command: |
             echo "$GH_APP_PRIVATE_KEY" | base64 --decode > private-key.pem
 
-            INSTALLATION_TOKEN=$(./.circleci/authorize-github-app-token.sh \
+            INSTALLATION_TOKEN=$(./.circleci/scripts/authorize-github-app-token.sh \
               "$GH_APP_ID" \
               "$GH_APP_INSTALLATION_ID" \
               "private-key.pem"
