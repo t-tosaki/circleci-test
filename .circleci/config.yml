@@ -8,13 +8,17 @@ jobs:
       - checkout
 
       - run:
+          name: Set deployment name
+          command: |
+            echo "export VERSION=production-$(date +%Y.%m.%d)-${CIRCLE_WORKFLOW_ID}" >> $BASH_ENV
+
+      - run:
           name: Do something
           command: echo $CIRCLE_SHA1
 
       - run:
           name: Create GitHub tag
           command: |
-            VERSION=production-$(date +%Y.%m.%d)-${CIRCLE_WORKFLOW_ID}
             git config user.email "ci@example.com"
             git config user.name "CircleCI"
             git tag -a "$VERSION" -m "CI: ${CIRCLE_BUILD_URL}\nTriggerd by: ${CIRCLE_USERNAME}"
