@@ -24,6 +24,14 @@ jobs:
             git tag -a "$VERSION" -m "CI: ${CIRCLE_BUILD_URL}\nTriggerd by: ${CIRCLE_USERNAME}"
             git push origin "$VERSION"
 
+      - run:
+          name: Create CircleCI release log
+          command: |
+            circleci run release log \
+              --environment-name=production \
+              --component-name=test \
+              --target-version=$VERSION
+
 workflows:
   deploy-workflow:
     jobs:
