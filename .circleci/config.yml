@@ -40,7 +40,7 @@ jobs:
             PR_NUMBER=$(echo $PR_JSON | jq -r '.number')
             PR_URL=$(echo $PR_JSON | jq -r '.url')
 
-            echo "export VERSION=production-$(date +%Y.%m.%d)-${PR_NUMBER}" >> $BASH_ENV
+            echo "export VERSION=production-$(date +%Y.%m.%d)-ci<< pipeline.number >>-pr${PR_NUMBER}" >> $BASH_ENV
             echo "export PR_URL=${PR_URL}" >> $BASH_ENV
 
       - run:
