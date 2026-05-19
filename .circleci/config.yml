@@ -104,8 +104,9 @@ jobs:
             LATEST_RELEASE_BODY_REPLACED=$(cat \<<-EOF
             ## 🚨 Rollbacked
 
-            - **Target version**: [<< pipeline.parameters.rollback_tag >>](https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/releases/tag/<< pipeline.parameters.rollback_tag >>)
-            - **Rollbacked by**: @${CIRCLE_USERNAME}
+            * **Target version**: [<< pipeline.parameters.rollback_tag >>](https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/releases/tag/<< pipeline.parameters.rollback_tag >>)
+            * **Rollbacked by**: @${CIRCLE_USERNAME}
+            **Full Changelog**: https://github.com/t-tosaki/circleci-test/compare/${LATEST_RELEASE_TAG}...<< pipeline.parameters.rollback_tag >>
 
             ---
 
