@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  github-cli: circleci/github-cli@2.2.0
+
 jobs:
   deploy:
     docker:
@@ -7,10 +10,29 @@ jobs:
     steps:
       - checkout
 
+      - github-cli/setup:
+          app-id: GH_APP_ID
+          app-installation-id: GH_APP_INSTALLATION_ID
+          app-private-key: GH_APP_PRIVATE_KEY
+
       - run:
           name: Set deployment name
           command: |
-            echo "export VERSION=production-$(date +%Y.%m.%d)-${CIRCLE_WORKFLOW_ID}" >> $BASH_ENV
+            PR_JSON=$(gh api "repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/commits/${COMMIT_HASH}/pulls" \
+               --jq '.[]
+                      | select(.base.ref == "master")
+                      | {
+                          number,
+                          url: .html_url,
+                        }')
+
+            echo $PR_JSON
+
+            PR_NUMBER=$(echo $PR_JSON | jq -r '.number')
+            PR_URL=$(echo $PR_JSON | jq -r '.url')
+
+            echo "export VERSION=production-$(date +%Y.%m.%d)-${PR_NUMBER}" >> $BASH_ENV
+            echo "export PR_URL=${PR_URL}" >> $BASH_ENV
 
       - run:
           name: Do something
@@ -21,16 +43,16 @@ jobs:
           command: |
             git config user.email "ci@example.com"
             git config user.name "CircleCI"
-            git tag -a "$VERSION" -m "CI: ${CIRCLE_BUILD_URL}\nTriggerd by: ${CIRCLE_USERNAME}"
+            git tag -a "$VERSION" -m "CI: ${CIRCLE_BUILD_URL}\nTriggerd by: ${CIRCLE_USERNAME}\nPR:${PR_URL}"
             git push origin "$VERSION"
 
       - run:
-          name: Create CircleCI release log
+          name: Create GitHub release
           command: |
-            circleci run release log \
-              --environment-name=production \
-              --component-name=test \
-              --target-version=$VERSION
+            gh release create "${VERSION}" \
+              --verify-tag \
+              --title "${VERSION}" \
+              --generate-notes
 
 workflows:
   deploy-workflow:
