@@ -14,13 +14,11 @@ jobs:
           name: Login GitHub App
           command: |
             echo "$GH_APP_PRIVATE_KEY" | base64 --decode > private-key.pem
-
             INSTALLATION_TOKEN=$(./.circleci/scripts/authorize-github-app-token.sh \
               "$GH_APP_ID" \
               "$GH_APP_INSTALLATION_ID" \
               "private-key.pem"
             )
-
             echo "export GITHUB_TOKEN=$INSTALLATION_TOKEN" >> $BASH_ENV
 
       - github-cli/setup
@@ -29,12 +27,8 @@ jobs:
           name: Set deployment name
           command: |
             PR_JSON=$(gh api "repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/commits/${COMMIT_HASH}/pulls" \
-               --jq '.[]
-                      | select(.base.ref == "master")
-                      | {
-                          number,
-                          url: .html_url,
-                        }')
+               --jq '.[] | select(.base.ref == "master") | {number, url: .html_url}'
+            )
 
             echo $PR_JSON
 
