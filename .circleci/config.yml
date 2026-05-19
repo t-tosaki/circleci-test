@@ -8,8 +8,13 @@ jobs:
       - checkout
 
       - run:
+          name: Set deployment name
+          command: |
+            echo "export VERSION=production-$(date +%Y.%m.%d)-${CIRCLE_WORKFLOW_ID}" >> $BASH_ENV
+
+      - run:
           name: Do something
-          command: echo Hello, World!
+          command: echo $CIRCLE_SHA1
 
       - run:
           name: Create GitHub tag
