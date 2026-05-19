@@ -105,7 +105,7 @@ jobs:
             ## 🚨 Rollbacked
 
             - **Target version**: [<< pipeline.parameters.rollback_tag >>](https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/releases/tag/<< pipeline.parameters.rollback_tag >>)
-            - **Rollbacked by**: [${CIRCLE_USERNAME}](https://github.com/${CIRCLE_USERNAME})
+            - **Rollbacked by**: @${CIRCLE_USERNAME}
 
             ---
 
