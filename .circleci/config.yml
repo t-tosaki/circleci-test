@@ -52,7 +52,7 @@ jobs:
           command: |
             git config user.email "ci@example.com"
             git config user.name "CircleCI"
-            git tag -a "$VERSION" -m "CI: ${CIRCLE_BUILD_URL}\nTriggerd by: ${CIRCLE_USERNAME}\nPR:${PR_URL}"
+            git tag -a "$VERSION" -m "${CIRCLE_BUILD_URL}"
             git push origin "$VERSION"
 
       - run:
@@ -97,6 +97,26 @@ jobs:
       - run:
           name: Replace latest GitHub release
           command: |
+            LATEST_RELEASE=$(gh release view --json body,tagName)
+            LATEST_RELEASE_TAG=$(echo "$LATEST_RELEASE" | jq -r '.tagName')
+            LATEST_RELEASE_BODY=$(echo "$LATEST_RELEASE" | jq -r '.body')
+
+            LATEST_RELEASE_BODY_REPLACED=$(cat <<-EOF
+            ## 🚨 Rollbacked
+
+            - **Target version**: << pipeline.parameters.rollback_tag >>
+            - **Rollbacked by**: ${CIRCLE_USERNAME}
+
+            ---
+
+            ${LATEST_RELEASE_BODY}
+            EOF
+            )
+
+            gh release edit "$LATEST_RELEASE_TAG" \
+              --title "[ROLLBACKED] ${LATEST_RELEASE_TAG}" \
+              --notes "${LATEST_RELEASE_BODY_REPLACED}"
+
             gh release edit "<< pipeline.parameters.rollback_tag >>" --latest
 
 workflows:
