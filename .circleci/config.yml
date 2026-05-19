@@ -10,10 +10,17 @@ jobs:
     steps:
       - checkout
 
-      - github-cli/setup:
-          app-id: GH_APP_ID
-          app-installation-id: GH_APP_INSTALLATION_ID
-          app-private-key: GH_APP_PRIVATE_KEY
+      - github-cli/install
+
+      - run:
+          name: Login GitHub App
+          command: |
+            echo "$GH_APP_PRIVATE_KEY" > /tmp/github_app_key.pem
+
+            gh auth login \
+              --with-app-id "$GH_APP_ID" \
+              --with-app-installation-id "GH_APP_INSTALLATION_ID" \
+              --with-key-file /tmp/github_app_key.pem
 
       - run:
           name: Set deployment name
