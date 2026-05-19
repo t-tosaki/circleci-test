@@ -73,7 +73,7 @@ jobs:
           name: Get rollback sha
           command: |
             ROLLBACK_SHA=$(git rev-parse "<< pipeline.parameters.rollback_tag >>^{commit}")
-            echo "export REVERT_SHA=${ROLLBACK_SHA}" >> $BASH_ENV
+            echo "export ROLLBACK_SHA=${ROLLBACK_SHA}" >> $BASH_ENV
 
       - run:
           name: Checkout target
