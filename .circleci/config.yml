@@ -49,10 +49,10 @@ jobs:
           name: Create GitHub tag
           command: |
             TAG_SHA=$(gh api --method POST "repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/git/tags" \
-              -f tag="${VERSION}"
-              -f message="${CIRCLE_BUILD_URL}"
-              -f object="${CIRCLE_SHA1}"
-              -f type="commit"
+              -f tag="${VERSION}" \
+              -f message="${CIRCLE_BUILD_URL}" \
+              -f object="${CIRCLE_SHA1}" \
+              -f type="commit" \
               --jq '.sha'
             )
             gh api --method POST "repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/git/refs" \
