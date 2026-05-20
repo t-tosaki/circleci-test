@@ -59,13 +59,13 @@ jobs:
               -f ref="refs/tags/$VERSION" \
               -f sha="${TAG_SHA}"
 
-      - run:
-          name: Create GitHub release
-          command: |
-            gh release create "${VERSION}" \
-              --verify-tag \
-              --title "${VERSION}" \
-              --generate-notes
+      # - run:
+      #     name: Create GitHub release
+      #     command: |
+      #       gh release create "${VERSION}" \
+      #         --verify-tag \
+      #         --title "${VERSION}" \
+      #         --generate-notes
 
   rollback:
     docker:
