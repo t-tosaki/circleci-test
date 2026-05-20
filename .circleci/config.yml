@@ -35,8 +35,6 @@ jobs:
                --jq '.[] | select(.base.ref == "master") | {number, url: .html_url}'
             )
 
-            echo $PR_JSON
-
             PR_NUMBER=$(echo $PR_JSON | jq -r '.number')
             PR_URL=$(echo $PR_JSON | jq -r '.url')
 
@@ -50,10 +48,16 @@ jobs:
       - run:
           name: Create GitHub tag
           command: |
-            git config user.email "ci@example.com"
-            git config user.name "CircleCI"
-            git tag -a "$VERSION" -m "${CIRCLE_BUILD_URL}"
-            git push origin "$VERSION"
+            TAG_SHA=$(gh api --method POST "repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/git/tags" \
+              -f tag="${VERSION}"
+              -f message="${CIRCLE_BUILD_URL}"
+              -f object="${CIRCLE_SHA1}"
+              -f type="commit"
+              --jq '.sha'
+            )
+            gh api --method POST "repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/git/refs" \
+              -f ref="refs/tags/$VERSION" \
+              -f sha="${TAG_SHA}"
 
       - run:
           name: Create GitHub release
