@@ -8,12 +8,25 @@ parameters:
     type: string
     default: ""
 
+x-constants:
+  canary-ips: &canary-ips |-
+    0.0.0.0
+    1.1.1.1
+
 jobs:
   deploy:
     docker:
       - image: cimg/base:current
+    environment:
+      CANARY_IPS: *canary-ips
     steps:
       - checkout
+
+      - run:
+          name: IP test
+          command: |
+            IPS=$(echo "$CANARY_IPS" | awk 'NF{printf "%s%s:*", s, $0; s=","}')
+            echo $IPS
 
       - run:
           name: Login GitHub App
@@ -59,13 +72,13 @@ jobs:
               -f ref="refs/tags/$VERSION" \
               -f sha="${TAG_SHA}"
 
-      # - run:
-      #     name: Create GitHub release
-      #     command: |
-      #       gh release create "${VERSION}" \
-      #         --verify-tag \
-      #         --title "${VERSION}" \
-      #         --generate-notes
+      - run:
+          name: Create GitHub release
+          command: |
+            gh release create "${VERSION}" \
+              --verify-tag \
+              --title "${VERSION}" \
+              --generate-notes
 
   rollback:
     docker:
